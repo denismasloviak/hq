@@ -936,7 +936,11 @@ async function push(loud=false){
   if(syncing) return;
   syncing=true; dot('busy');
   try{
-    const body={description:'HQ data',files:{'hq.json':{content:JSON.stringify(D)}}};
+    // sync (token + gistId) sa NIKDY neposiela do Gistu.
+    // GitHub skenuje svoj obsah a nájdený token automaticky zruší — appka
+    // by si tak pri každej zmene sama odpílila prihlásenie.
+    const {sync:_vynechaj, ...naGist}=D;
+    const body={description:'HQ data',files:{'hq.json':{content:JSON.stringify(naGist)}}};
     let r;
     await ensureGist();
     if(D.sync.gistId) r=await api('https://api.github.com/gists/'+D.sync.gistId,{method:'PATCH',body:JSON.stringify(body)});
